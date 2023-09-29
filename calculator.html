@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Calculator</title>
+  </head>
+  <body>
+    <p>
+      <button onclick="
+        click1() ">
+        1
+      </button>
+
+      <button onclick="
+        click2()">
+        2
+      </button>
+      
+      <button onclick="
+        click3()">
+        3
+      </button>
+      
+      <button onclick="
+       clickPlus()">
+       +
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        click4() ">
+        4
+      </button>
+
+      <button onclick="
+        click5()">
+        5
+      </button>
+      
+      <button onclick="
+        click6()">
+        6
+      </button>
+      
+      <button onclick="
+       clickMinus()">
+       -
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        click7() ">
+        7
+      </button>
+
+      <button onclick="
+        click8()">
+        8
+      </button>
+      
+      <button onclick="
+        click9()">
+        9
+      </button>
+      
+      <button onclick="
+       clickTimes()">
+       *
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        click0() ">
+        0
+      </button>
+
+      <button onclick="
+        clickDot()">
+        .
+      </button>
+      
+      <button onclick="
+        clickEqual()">
+        =
+      </button>
+      
+      <button onclick="
+       clickDevide()">
+       /
+      </button>
+    </p>
+    
+    
+    <script>
+      function click0(){
+        calculation += '0';
+        console.log(calculation);
+      }
+      function click1(){
+        calculation += '1';
+        console.log(calculation);
+      }
+      function click2(){
+        calculation += '2';
+        console.log(calculation);
+      }
+      function click3(){
+        calculation += '3';
+        console.log(calculation);
+      }
+      function click4(){
+        calculation += '4';
+        console.log(calculation);
+      }
+      function click5(){
+        calculation += '5';
+        console.log(calculation);
+      }
+      function click6(){
+        calculation += '6';
+        console.log(calculation);
+      }
+      function click7(){
+        calculation += '7';
+        console.log(calculation);
+      }
+      function click8(){
+        calculation += '8';
+        console.log(calculation);
+      }
+      function click9(){
+        calculation += '9';
+        console.log(calculation);
+      }
+      function clickPlus(){
+        calculation += ' + ';
+        console.log(calculation);
+      }
+      function clickMinus(){
+        calculation += ' - ';
+        console.log(calculation);
+      }
+      function clickTimes(){
+        calculation += ' * ';
+        console.log(calculation);
+      }
+      function clickDevide(){
+        calculation += ' / ';
+        console.log(calculation);
+      }
+      function clickDot(){
+        calculation += '.';
+        console.log(calculation);
+      }
+      function clickEqual(){
+        calculation = eval(calculation);
+        console.log(calculation);
+      }
+      let calculation = '';
+    </script>
+  </body>
+
+</html>
