@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Calculator</title>
+  </head>
+  <body>
+    <p>
+      <button onclick="
+        UpdateCalculation('1') ">
+        1
+      </button>
+
+      <button onclick="
+        UpdateCalculation('2')">
+        2
+      </button>
+      
+      <button onclick="
+        UpdateCalculation('3')">
+        3
+      </button>
+      
+      <button onclick="
+       UpdateCalculation(' + ')">
+       +
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        UpdateCalculation('4') ">
+        4
+      </button>
+
+      <button onclick="
+        UpdateCalculation('5')">
+        5
+      </button>
+      
+      <button onclick="
+        UpdateCalculation('6')">
+        6
+      </button>
+      
+      <button onclick="
+       UpdateCalculation(' - ')">
+       -
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        UpdateCalculation('7') ">
+        7
+      </button>
+
+      <button onclick="
+        UpdateCalculation('8')">
+        8
+      </button>
+      
+      <button onclick="
+        UpdateCalculation('9')">
+        9
+      </button>
+      
+      <button onclick="
+       UpdateCalculation(' * ')">
+       *
+      </button>
+    </p>
+    
+    <p>
+      <button onclick="
+        UpdateCalculation('0') ">
+        0
+      </button>
+
+      <button onclick="
+        UpdateCalculation('.')">
+        .
+      </button>
+      
+      <button onclick="
+        UpdateCalculation('=')">
+        =
+      </button>
+      
+      <button onclick="
+       UpdateCalculation(' / ')">
+       /
+      </button>
+    </p>
+    
+    
+    <script>
+      let calculation = localStorage.getItem('Calc')|| '';
+
+      function UpdateCalculation(key){
+        if(key === "="){
+          calculation = eval(calculation);
+          localStorage.setItem('Calc', calculation);
+          console.log(calculation);
+        }
+        else{
+          calculation += key;
+          console.log(calculation);
+        }
+      }
+     
+    </script>
+  </body>
+
+</html>
