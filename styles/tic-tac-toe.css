@@ -48,31 +48,24 @@
 }
 
 .button-font{
-  font-size: 35px;
-  font-family: Ariel;
+  font-size: 80px;
+  font-family: Ariel Bold;
   padding: 20px 60px;
   border-radius: 20px;
   color: darkred;
   background-color: lightblue;
   border: black solid;
   cursor: pointer;
-  /* You can remove these styles to center horizontally within the container */
-  /* left: 50%;
-  position: absolute; */
 }
 
 
 .text-font{
-  font-size: 40px;
-  font-family: Arial bold;
+  font-size: 70px;
+  font-family: Arial Bold;
   padding: px;
   font-style: unset;
   border-radius: 20px;
   color: darkcyan ;
-  /* You can remove these styles to center horizontally within the container */
-  /* left: 50%;
-  position: absolute; */
-
 }
 /* lines */
 
