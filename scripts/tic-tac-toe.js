@@ -1,250 +1,304 @@
 // 1 == X   (computer)
 // 2 == O   (human)
-const computer = 1;
-const human = 2;
+const computer = 'x';
+const human = 'o';
 
-//let turn = Math.random()>0.5 ? computer : human; 
 
-let turn = human;
 
-const matrix=[
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked",
-    "unClicked"];
+let board = [
+  ['_', '_', '_'],
+  ['_', '_', '_'],
+  ['_', '_', '_']
+];
 
-LockDisplay();
+let player = 'x';
 
-function minMax(board, depth, isMaximizingPlayer) {
-  // Base case: Check if the game is over (e.g., win, tie, or depth limit reached)
-  const result = checkGameResult(board);
-  if (result !== null) {
-    return result; // Return the score
-  }
-
-  if (isMaximizingPlayer) {
-    let bestScore = -Infinity;
-    for (let i = 0; i < board.length; i++) {
-      for (let j = 0; j < board[i].length; j++) {
-        if (board[i][j] === "unClicked") {
-          board[i][j] = computer; // Make a move for the computer
-          const score = minMax(board, depth + 1, false);
-          board[i][j] = "unClicked"; // Undo the move
-          bestScore = Math.max(score, bestScore);
-        }
-      }
+class Move
+{
+    constructor()
+    {
+        let row,col;
     }
-    return bestScore;
-  } else {
-    let bestScore = Infinity;
-    for (let i = 0; i < board.length; i++) {
-      for (let j = 0; j < board[i].length; j++) {
-        if (board[i][j] === "unClicked") {
-          board[i][j] = human; // Make a move for the human player
-          const score = minMax(board, depth + 1, true);
-          board[i][j] = "unClicked"; // Undo the move
-          bestScore = Math.min(score, bestScore);
-        }
-      }
-    }
-    return bestScore;
-  }
 }
 
-function minMax(){
-
-}
-
-function computerMove(){
-
- // Get a reference to the overlay element
+function computerMove() {
+   // Get a reference to the overlay element
 const overlay = document.getElementById('overlay');
 
 overlay.style.pointerEvents = 'auto'; // Enable pointer events to block interactions
 
+  const availableMoves = findAvailableMoves();
+  let bestMove;
+  let bestScore = -Infinity;
 
-  let chose = false;
-  let num = Math.round(Math.random()*8); 
-  while(!chose){
-    if(matrix[num]==="unClicked")
-      chose=true;
-    else
-      num = Math.round(Math.random()*8);  
+  for (const move of availableMoves) {
+    const { row, col } = move;
+    board[row][col] = computer; // Make the move
+    const score = minimax(0, false);
+    board[row][col] = '_'; // Undo the move
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = move;
+    }
   }
+  console.log(bestMove);
+  console.log(board);
+
+  const { row, col } = bestMove;
+  console.log(bestMove);
+  const param = row*3+col+1;
   setTimeout(function(){
-       num++;
-
-    //  num = minMax();
-      Click(num);
-      // To disable the overlay (make it transparent and non-blocking)
-    overlay.style.backgroundColor = 'transparent';
-    overlay.style.pointerEvents = 'none';
-  },1000);      
- 
+        Click(param);
+        // To disable the overlay (make it transparent and non-blocking)
+      overlay.style.backgroundColor = 'transparent';
+      overlay.style.pointerEvents = 'none';
+    },1000);      
+  
+}
 
 
+function checkWin(player) {
+  // Check rows
+  for (let i = 0; i < 3; i++) {
+    if (board[i][0] === player && board[i][1] === player && board[i][2] === player) {
+      return true;
+    }
+  }
 
+  // Check columns
+  for (let j = 0; j < 3; j++) {
+    if (board[0][j] === player && board[1][j] === player && board[2][j]=== player) {
+      return true;
+    }
+  }
+
+  // Check diagonals
+  if (board[0][0] === player && board[1][1] === player && board[2][2] === player) {
+    return true;
+  }
+  if (board[0][2] === player && board[1][1] === player && board[2][0] === player) {
+    return true;
+  }
+
+  return false;
+}
+
+function isTie() {
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '_') {
+        return false; // There's an empty cell, the game is not a tie.
+      }
+    }
+  }
+  return true; // All cells are filled, it's a tie.
+}
+
+function evaluate() {
+  let score = 0;
+
+  // Evaluate rows
+  for (let row = 0; row < 3; row++) {
+    score += evaluateLine(board[row][0], board[row][1], board[row][2]);
+  }
+
+  // Evaluate columns
+  for (let col = 0; col < 3; col++) {
+    score += evaluateLine(board[0][col], board[1][col], board[2][col]);
+  }
+
+  // Evaluate diagonals
+  score += evaluateLine(board[0][0], board[1][1], board[2][2]);
+  score += evaluateLine(board[0][2], board[1][1], board[2][0]);
+
+  return score;
+}
+
+function evaluateLine(cell1, cell2, cell3) {
+  const line = [cell1, cell2, cell3];
+  let computerCount = 0;
+  let humanCount = 0;
+
+  for (const cell of line) {
+    if (cell === computer) {
+      computerCount++;
+    } else if (cell === human) {
+      humanCount++;
+    }
+  }
+
+  // Assign scores based on the presence of computer and human marks
+  if (computerCount === 2 && humanCount === 0) {
+    return 10; // Computer can win with one more move
+  } else if (humanCount === 2 && computerCount === 0) {
+    return -10; // Human can win with one more move
+  } else {
+    return 0; // No immediate win or loss
+  }
+}
+
+
+function findAvailableMoves() {
+  const availableMoves = [];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i][j] === '_') {
+        availableMoves.push({ row: i, col: j });
+      }
+    }
+  }
+  return availableMoves;
+}
+
+function minimax(depth, maximizingPlayer) {
+  const scores = {
+    [computer]: 1,
+    [human]: -1,
+    tie: 0,
+  };
+
+  const winner = checkWin(computer) ? computer : checkWin(human) ? human : isTie() ? 'tie' : null;
+
+  if (winner !== null) {
+    return scores[winner];
+  }
+
+  if (maximizingPlayer) {
+    let bestScore = -Infinity;
+    const availableMoves = findAvailableMoves();
+    
+    for (const move of availableMoves) {
+      const { row, col } = move;
+      board[row][col] = computer;
+      const score = minimax(depth + 1, false);
+      board[row][col] = '_'; // Undo the move
+      bestScore = Math.max(score, bestScore);
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    const availableMoves = findAvailableMoves();
+    
+    for (const move of availableMoves) {
+      const { row, col } = move;
+      board[row][col] = human;
+      const score = minimax(depth + 1, true);
+      board[row][col] = '_'; // Undo the move
+      bestScore = Math.min(score, bestScore);
+    }
+    return bestScore;
+  }
 }
 
 function Click(param){
-  const index = param-1;
-  if (index >= 0 && index < 9 && matrix[index] === "unClicked") {
-    if (turn === 1) { // computer
-      matrix[index] = "clicked1";
-    } else if (turn === 2) { // human
-      matrix[index] = "clicked2";
-    }
-    turn = 3 - turn; // Toggle the turn between 1 and 2
-    UpdateDisplay();
-
+  const index = param - 1;
+    // Update the corresponding cell on the board array
+    const row = Math.floor(index / 3);
+    const col = index % 3;
+  
+  if (board[row][col] === "_") {
+    
+    // Update the corresponding cell on the board array
+    board[row][col] = player; // Update the board with the player's move
+    player===human?player=computer:player=human; // Toggle the turn between 1 and 2
+    UpdateDisplay(player);
   }
 }
 
-function isTie() {// check if Tie
-  let Tie = true;
-  for (let i=0; i<9; i++)
-    if(matrix[i]==="unClicked" || matrix[i]==="ended"){
-      Tie = false;
+function Tie() {// check if Tie
+  let tie = true;
+  for (let i=0; i<3; i++)
+    for(let j=0;j<3;j++)  
+      if(board[i][j]==="_" || board[i][j]==="ended"){
+        tie = false;
       break;
     }
-  if(Tie){
+  if(tie){
     document.querySelector('.display-turns-js').innerHTML = "Tie!";
   }
-  return Tie;
+  return tie;
 }
 
 
-function UpdateDisplay(){
-  document.querySelector('.display-turns-js').innerHTML = (turn === human) ? "Human turn" : "Computer Turn";
-  {
-    for(let i=0;i<9;i++){
-    if(matrix[i]==="unClicked"){
-      document.querySelector('.div'+(i+1)).
-      innerHTML='';
-    }
-    else if(matrix[i]==="clicked1"){ // computer
-      document.querySelector('.div'+(i+1)).
-      innerHTML="<img src='images\\X.png' width=\"300px\" height=\"300px\">";
-      console.log(i + " clicked1");
-    } // human
-    else if(matrix[i]==="clicked2"){
-      document.querySelector('.div'+(i+1)).innerHTML="<img src='images\\O.png'>";
-      console.log(i + " clicked2");
-    }
+function UpdateDisplay(player){
+  document.querySelector('.display-turns-js').innerHTML = (player === human) ? "Human turn" : "Computer Turn";
+
+  for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      if(board[i][j]==="_"){
+        document.querySelector('.div'+(i*3+j+1)).
+        innerHTML='';
+      }
+      else if(board[i][j]===computer){ // computer
+        document.querySelector('.div'+(i*3+j+1)).
+        innerHTML="<img src='images\\X.png' width=\"300px\" height=\"300px\">";
+      } 
+      else if(board[i][j]===human){ // human
+        document.querySelector('.div'+(i*3+j+1)).innerHTML="<img src='images\\O.png'>";
+      }
+    } 
   }
-}
   
   textElem = document.querySelector('.display-turns-js');
   
-  {
+  
   // check if player O won (1)
-  if(matrix[0]==="clicked1" && matrix[1]==="clicked1" && matrix[2]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('horizontal1-win');
+ // Check rows
+ for (let i = 0; i < 3; i++) {
+  if (board[i][0] === human && board[i][1] === human && board[i][2] === human) {
+    document.querySelector('.grid-container').classList.add('horizontal'+(i+1)+'-win');
+    textElem.innerHTML = "Human Won!"
+    LockDisplay();  }
+  else if (board[i][0] === computer && board[i][1] === computer && board[i][2] === computer) {
+    document.querySelector('.grid-container').classList.add('horizontal'+(i+1)+'-win');
     textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
-  else if(matrix[3]==="clicked1" && matrix[4]==="clicked1" && matrix[5]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('horizontal2-win');
+    LockDisplay();  }
+}
+
+// Check columns
+for (let j = 0; j < 3; j++) {
+  if (board[0][j] === human && board[1][j] === human && board[2][j]=== human) {
+    document.querySelector('.grid-container').classList.add('vertical'+(j+1)+'-win');
+    textElem.innerHTML = "Human Won!"
+    LockDisplay();  }
+  else if (board[0][j] === computer && board[1][j] === computer && board[2][j]=== computer) {
+    document.querySelector('.grid-container').classList.add('vertical'+(j+1)+'-win');
     textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
-  else if(matrix[6]==="clicked1" && matrix[7]==="clicked1" && matrix[8]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('horizontal3-win');
-    textElem.innerHTML = "Computer Won!"
-    LockDisplay();
+    LockDisplay();  }  
   }
 
-  else if(matrix[0]==="clicked1" && matrix[3]==="clicked1" && matrix[6]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('vertical1-win');
-    textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
-  else if(matrix[1]==="clicked1" && matrix[4]==="clicked1" && matrix[7]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('vertical2-win');
-    textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
-  else if(matrix[2]==="clicked1" && matrix[5]==="clicked1" && matrix[8]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('vertical3-win');
-    textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
 
-  else if(matrix[0]==="clicked1" && matrix[4]==="clicked1" && matrix[8]==="clicked1"){
+  // Check diagonals
+  if (board[0][0] === human && board[1][1] === human && board[2][2] === human) {
+    document.querySelector('.grid-container').classList.add('diagonal-win-lr');
+    textElem.innerHTML = "Human Won!"
+  }
+  else if (board[0][0] === computer && board[1][1] === computer && board[2][2] === computer) {
     document.querySelector('.grid-container').classList.add('diagonal-win-lr');
     textElem.innerHTML = "Computer Won!"
-    LockDisplay();
   }
-  else if(matrix[2]==="clicked1" && matrix[4]==="clicked1" && matrix[6]==="clicked1"){
-    document.querySelector('.grid-container').classList.add('diagonal-win-rl');
-    textElem.innerHTML = "Computer Won!"
-    LockDisplay();
-  }
-  }
-  {
-  // check if player X won (2) (human)
-  if(matrix[0]==="clicked2" && matrix[1]==="clicked2" && matrix[2]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('horizontal1-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-  else if(matrix[3]==="clicked2" && matrix[4]==="clicked2" && matrix[5]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('horizontal2-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-  else if(matrix[6]==="clicked2" && matrix[7]==="clicked2" && matrix[8]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('horizontal3-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-
-  else if(matrix[0]==="clicked2" && matrix[3]==="clicked2" && matrix[6]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('vertical1-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-  else if(matrix[1]==="clicked2" && matrix[4]==="clicked2" && matrix[7]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('vertical2-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-  else if(matrix[2]==="clicked2" && matrix[5]==="clicked2" && matrix[8]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('vertical3-win');
-    textElem.innerHTML = "Human Won!"
-    LockDisplay();
-  }
-
-  else if(matrix[0]==="clicked2" && matrix[4]==="clicked2" && matrix[8]==="clicked2"){
-    document.querySelector('.grid-container').classList.add('diagonal-win-lr');
-    textElem.innerHTML = "Human Won!";    LockDisplay();
-  }
-  else if(matrix[2]==="clicked2" && matrix[4]==="clicked2" && matrix[6]==="clicked2"){
+  else if (board[0][2] === human && board[1][1] === human && board[2][0] === human) {
     document.querySelector('.grid-container').classList.add('diagonal-win-rl');
     textElem.innerHTML = "Human Won!";    LockDisplay();
   }
+  else if (board[0][2] === computer && board[1][1] === computer && board[2][0] === computer) {
+    document.querySelector('.grid-container').classList.add('diagonal-win-rl');
+    textElem.innerHTML = "Computer Won!";    LockDisplay();
   }
-  const Tie = isTie();
-  console.log("Is tie? " + Tie);
-  console.log(turn);
-  if(turn === computer && !Tie && matrix[0]!=="ended"){
-    console.log("in if");
+ 
+  const tie = Tie();
+  if(player === computer && !tie && board[0][0]!=="ended"){
     computerMove(); 
   }
 }
 
-
-
 function Start(whoStart){
-  turn = whoStart;
-  console.log("Start");
-  for (let i=0; i<9; i++)
-    matrix[i]="unClicked";
+  player = whoStart;
+  for (let i=0; i<3; i++)
+    for(let j=0; j<3; j++)
+      board[i][j] = '_';
+  
   document.querySelector('.grid-container').classList.remove('horizontal1-win');
   document.querySelector('.grid-container').classList.remove('horizontal2-win');
   document.querySelector('.grid-container').classList.remove('horizontal3-win');
@@ -257,11 +311,12 @@ function Start(whoStart){
   document.querySelector('.grid-container').classList.remove('diagonal-win-rl');
 
 
-  UpdateDisplay();
+  UpdateDisplay(player);
 
 }
 
 function LockDisplay(){
-  for (let i=0; i<9; i++)
-    matrix[i]="ended";
+  for (let i=0; i<3; i++)
+    for (let j=0; j<3; j++)
+      board[i][j] = 'ended';  
 }
